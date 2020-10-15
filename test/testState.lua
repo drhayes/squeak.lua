@@ -1,4 +1,4 @@
-local State = require 'state'
+local State = require 'squeak.state'
 
 describe('State', function()
   it('works at all', function()

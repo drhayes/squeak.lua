@@ -1,6 +1,6 @@
-local GobsList = require 'gobsList'
-local EventEmitter = require 'eventEmitter'
-local GameObject = require 'gameObject'
+local GobsList = require 'squeak.gobsList'
+local EventEmitter = require 'squeak.eventEmitter'
+local GameObject = require 'squeak.gameObject'
 
 local CustomGameObject = GameObject:extend()
 

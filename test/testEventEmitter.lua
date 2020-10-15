@@ -1,4 +1,4 @@
-local EventEmitter = require 'eventEmitter'
+local EventEmitter = require 'squeak.eventEmitter'
 
 describe('EventEmitter', function()
   it('exists', function()

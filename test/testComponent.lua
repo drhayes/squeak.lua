@@ -1,4 +1,4 @@
-local Component = require 'component'
+local Component = require 'squeak.component'
 
 describe('Component', function()
   it('works at all', function()

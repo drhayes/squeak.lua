@@ -1,5 +1,5 @@
-local GameObject = require 'gameObject'
-local Component = require 'component'
+local GameObject = require 'squeak.gameObject'
+local Component = require 'squeak.component'
 
 local TestComponent = Component:extend()
 

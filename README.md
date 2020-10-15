@@ -1,4 +1,4 @@
-# squick.lua
+# Squeak
 
 A small, opinionated game framework.
 
