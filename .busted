@@ -1,7 +1,7 @@
 return {
   default = {
     verbose = true,
-    pattern = 'test_',
+    pattern = 'test',
     recursive = true,
     root = 'test/',
   },
