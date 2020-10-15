@@ -1,5 +1,5 @@
-local Object = require 'lib.classic'
-local lume = require 'lib.lume'
+local Object = require 'classic'
+local lume = require 'lume'
 
 local GameObject = Object:extend()
 
