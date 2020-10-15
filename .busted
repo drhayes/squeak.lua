@@ -1,0 +1,8 @@
+return {
+  default = {
+    verbose = true,
+    pattern = 'test_',
+    recursive = true,
+    root = 'test/',
+  },
+}
