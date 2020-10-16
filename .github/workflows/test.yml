@@ -1,0 +1,24 @@
+name: Test The Things
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+
+    - uses: leafo/gh-actions-lua@v6
+      with:
+        luaVersion: "luajit-2.0.5"
+
+    - uses: leafo/gh-actions-luarocks@v2
+
+    - name: build
+      run: |
+        luarocks install busted
+
+    - name: test
+      run: |
+        make test
