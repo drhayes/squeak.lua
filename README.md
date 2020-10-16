@@ -2,6 +2,15 @@
 
 A small, opinionated game framework.
 
+![Are tests passing?](https://github.com/drhayes/squeak.lua/workflows/Tests/badge.svg)
+
+
+## Install
+
+Copy the `squeak` folder somewhere into your project and you should be good to go.
+
+You can then `local GameObject require 'squeak.gameObject'` (or whatever) and will be good to go.
+
 
 ## Credit Where Credit Is Due
 
