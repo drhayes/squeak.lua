@@ -1,4 +1,7 @@
 local Coroutine = require 'squeak.coroutine'
+local log = require 'log'
+-- Don't log anything please.
+log.level = 'fatal'
 
 describe('Coroutine', function()
   it('works at all', function()

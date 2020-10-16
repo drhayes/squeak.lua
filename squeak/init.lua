@@ -27,6 +27,7 @@ local Squeak = {
 
 Squeak.component = require(PATH..'.component')
 Squeak.coroutine = require(PATH .. '.coroutine')
+Squeak.coroutineList = require(PATH .. '.coroutineList')
 Squeak.eventEmitter = require(PATH..'.eventEmitter')
 Squeak.gameObject = require(PATH..'.gameObject')
 Squeak.gobsList = require(PATH..'.gobsList')
