@@ -25,11 +25,13 @@ local Squeak = {
    ]]
 }
 
-Squeak.component     = require(PATH..'.component')
-Squeak.eventEmitter     = require(PATH..'.eventEmitter')
-Squeak.gameObject     = require(PATH..'.gameObject')
-Squeak.gobsList     = require(PATH..'.gobsList')
-Squeak.state     = require(PATH..'.state')
-Squeak.stateMachine     = require(PATH..'.stateMachine')
+Squeak.component = require(PATH..'.component')
+Squeak.eventEmitter = require(PATH..'.eventEmitter')
+Squeak.gameObject = require(PATH..'.gameObject')
+Squeak.gobsList = require(PATH..'.gobsList')
+Squeak.scene = require(PATH .. '.scene')
+Squeak.sceneManager = require(PATH .. '.sceneManager')
+Squeak.state = require(PATH..'.state')
+Squeak.stateMachine = require(PATH..'.stateMachine')
 
 return Squeak
