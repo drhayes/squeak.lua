@@ -1,4 +1,4 @@
-local Object = require 'lib.classic'
+local Object = require 'classic'
 
 local Component = Object:extend()
 
@@ -16,6 +16,7 @@ function Component:debugDraw() end
 -- Called when component is added to GameObject.
 function Component:added(parent)
   self.parent = parent
+  self.removeMe = false
 end
 
 -- Called when component is removed from GameObject.
@@ -24,10 +25,10 @@ function Component:removed()
 end
 
 -- Called when GameObject is added to game.
-function Component:gobAdded(gob) end
+function Component:gobAdded() end
 
 -- Called when GameObject is removed from game.
-function Component:gobRemoved(gob) end
+function Component:gobRemoved() end
 
 function Component:__tostring()
   return 'Component'

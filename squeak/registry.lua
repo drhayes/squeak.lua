@@ -8,6 +8,7 @@ end
 
 function Registry:add(key, instance)
   self.services[key] = instance
+  return instance
 end
 
 function Registry:get(key)

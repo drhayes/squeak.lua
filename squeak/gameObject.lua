@@ -15,9 +15,24 @@ function GameObject:add(component)
   return component
 end
 
-function GameObject:has(component)
-  local componentType = getmetatable(component)
-  return lume.any(self.components, function(c) return c:is(componentType) end)
+function GameObject:has(componentType)
+  -- local componentType = getmetatable(component)
+  for i = 1, #self.components do
+    local component = self.components[i]
+    if component:is(componentType) then
+      return true
+    end
+  end
+  return false
+end
+
+function GameObject:findFirst(componentType)
+  for i = 1, #self.components do
+    local component = self.components[i]
+    if component:is(componentType) then
+      return component
+    end
+  end
 end
 
 function GameObject:remove(component)

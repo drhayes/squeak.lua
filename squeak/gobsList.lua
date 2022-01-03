@@ -1,11 +1,14 @@
 local Object = require 'classic'
+local PATH = (...):gsub('%.[^%.]+$', '')
+local EventEmitter = require(PATH .. '.eventEmitter')
 local lume = require 'lume'
+
 
 local GobsList = Object:extend()
 
-function GobsList:new(eventBus, gobCompare)
-  self.eventBus = eventBus
+function GobsList:new(gobCompare)
   self.gobCompare = gobCompare
+  self.events = EventEmitter()
   self.gobs = {}
   self.additions = {}
   self.removals = {}
@@ -29,7 +32,7 @@ function GobsList:update(dt)
     local gob = additions[i]
     table.insert(self.gobs, gob)
     gob:gobAdded()
-    self.eventBus:emit('gobAdded', gob)
+    self.events:emit('gobAdded', gob)
   end
   if #additions > 0 then
     if self.gobCompare then
@@ -44,7 +47,7 @@ function GobsList:update(dt)
     local gob = removals[i]
     lume.remove(self.gobs, gob)
     gob:gobRemoved()
-    self.eventBus:emit('gobRemoved', gob)
+    self.events:emit('gobRemoved', gob)
   end
   if #removals > 0 then
     lume.clear(self.removals)
@@ -72,7 +75,7 @@ function GobsList:clear()
     gob:gobRemoved()
   end
   lume.clear(self.gobs)
-  self.eventBus:emit('gobsCleared')
+  self.events:emit('gobsCleared')
 end
 
 function GobsList:findFirst(gobType)
@@ -82,6 +85,10 @@ function GobsList:findFirst(gobType)
       return gob
     end
   end
+end
+
+function GobsList:on(...)
+  self.events:on(...)
 end
 
 return GobsList

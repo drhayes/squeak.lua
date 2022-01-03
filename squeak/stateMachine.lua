@@ -10,9 +10,11 @@ end
 
 function StateMachine:add(name, state)
   self.states[name] = state
+  state.parent = self
   if not self.initial then
     self.initial = state
   end
+  return state
 end
 
 function StateMachine:switch(name)
@@ -38,17 +40,9 @@ end
 
 function StateMachine:update(dt)
   StateMachine.super.update(self, dt)
-  -- log.debug('update')
 
   local transitionTo = self.current:update(dt)
-  if transitionTo then
-    local nextState = self.states[transitionTo]
-    if nextState then
-      self.current:leave()
-      self.current = nextState
-      self.current:enter()
-    end
-  end
+  if transitionTo then self:switch(transitionTo) end
 end
 
 function StateMachine:draw()
