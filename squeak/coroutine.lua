@@ -1,6 +1,6 @@
 local PATH = (...):gsub('%.[^%.]+$', '')
 local Component = require(PATH .. '.component')
-local log = require 'log'
+local log = require 'lib.log'
 
 local Coroutine = Component:extend()
 

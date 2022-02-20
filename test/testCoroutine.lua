@@ -1,12 +1,10 @@
-local Coroutine = require 'squeak.coroutine'
-local log = require 'log'
+local log = require 'lib.log'
 -- Don't log anything please.
 log.level = 'fatal'
 
+local Coroutine = require 'squeak.coroutine'
+
 describe('Coroutine', function()
-  it('works at all', function()
-    assert.are.equal('table', type(Coroutine))
-  end)
 
   it('can wait one second', function()
     local areWeThereYet = false
