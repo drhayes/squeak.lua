@@ -2,59 +2,41 @@ local StateMachine = require 'squeak.stateMachine'
 local State = require 'squeak.state'
 
 describe('StateMachine', function()
-  local s, sm
+  local function create()
+    return StateMachine({
+      one = { stuff = 'two' },
+      two = { otherStuff = 'one' },
+    })
+  end
 
-  before_each(function()
-    s = State()
-    sm = StateMachine()
+  it('requires a transition table to generate state names and event names', function()
+    local sm = create()
+    assert.truthy(sm.stateNames)
+    assert.truthy(sm.stateNames['one'])
+    assert.truthy(sm.stateNames['two'])
+    assert.truthy(sm.eventNames)
+    assert.truthy(sm.eventNames['stuff'])
+    assert.truthy(sm.eventNames['otherStuff'])
   end)
 
-  it('works at all', function()
-    assert.are.equal('table', type(StateMachine))
+  it('throws on trying to set invalid state name', function()
+    local sm = create()
+    assert.has_error(function()
+      sm:add('catpants', {})
+    end, 'Illegal state added: catpants')
   end)
 
-  it('sets a state as initial when first added', function()
-    sm:add('cats', s)
-    assert.are.equal(s, sm.initial)
+  it('throws on trying to fire invalid event', function()
+    local sm = create()
+    assert.has_error(function()
+      sm:fireEvent('shoot')
+    end, 'Illegal event fired: shoot')
   end)
 
-  it('calls lifecycle methods when switching', function()
-    local s2 = State()
-    sm:add('first', s)
-    sm:add('second', s2)
-    sm.current = s
-    local leaveCalled = false
-    s.leave = function() leaveCalled = true end
-    local enterCalled = false
-    s2.enter = function() enterCalled = true end
-    sm:switch('second')
-    assert.truthy(leaveCalled)
-    assert.truthy(enterCalled)
-  end)
-
-  it('transitions during update', function()
-    s.update = function() return 'second' end
-    local s2 = State()
-    local leaveCalled = false
-    s.leave = function() leaveCalled = true end
-    local enterCalled = false
-    s2.enter = function() enterCalled = true end
-    sm:add('first', s)
-    sm:add('second', s2)
-    sm.current = s
-    sm:update()
-    assert.truthy(leaveCalled)
-    assert.truthy(enterCalled)
-  end)
-
-  it('sets initial to current on gobAdded', function()
-    sm:add('first', s)
-    local enterCalled = false
-    s.enter = function() enterCalled = true end
-    assert.are.equal(s, sm.initial)
-    assert.falsy(sm.current)
-    sm:gobAdded()
-    assert.truthy(enterCalled)
-    assert.are.equal(s, sm.current)
+  it('validates itself when the game object is added to the game', function()
+    local sm = create()
+    assert.has_error(function()
+      sm:gobAdded()
+    end)
   end)
 end)
