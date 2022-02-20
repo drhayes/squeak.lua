@@ -1,6 +1,10 @@
-local Object = require 'classic'
+local Object = require 'lib.classic'
 local PATH = (...):gsub('%.[^%.]+$', '')
 local Stack = require(PATH .. '.stack')
+-- Compatibility.
+table.pack = table.pack or function(...) return { n = select("#", ...), ... } end
+table.unpack = table.unpack or unpack
+
 
 local SceneManager = Object:extend()
 
@@ -33,7 +37,7 @@ function SceneManager:switch(newSceneName, ...)
 
   self.nextSceneAction = 'switch'
   self.nextScene = newScene
-  self.nextSceneArgs = { ... }
+  self.nextSceneArgs = table.pack(...)
 
   return newScene
 end
@@ -45,7 +49,7 @@ function SceneManager:push(newSceneName, ...)
 
   self.nextSceneAction = 'push'
   self.nextScene = newScene
-  self.nextSceneArgs = { ... }
+  self.nextSceneArgs = table.pack(...)
 
 end
 
@@ -59,22 +63,36 @@ function SceneManager:update(dt)
   if current then
     current:update(dt)
   end
+end
+
+-- Doing all the scene switching after draw to prevent a frame
+-- of black, uninitialized scene-stuff getting drawn after a switch
+-- in update.
+function SceneManager:draw()
+  local current = self.sceneStack:top()
+  if current then
+    current:draw()
+  end
+
+  -- Now the current scene is drawn, check to see if we're switching.
   if self.nextSceneAction == 'switch' then
     self.nextSceneAction = nil
     -- Leave all our current scenes.
     local scratchScene = self.sceneStack:pop()
     while scratchScene ~= nil do
       scratchScene:leave()
-      scratchScene = self.sceneStack:top()
+      scratchScene = self.sceneStack:pop()
     end
 
     -- This scene is the current. Enter it.
     self.sceneStack:push(self.nextScene)
-    self.nextScene:enter(unpack(self.nextSceneArgs))
+    self.nextScene:enter(table.unpack(self.nextSceneArgs, 1, self.nextSceneArgs.n))
+
   elseif self.nextSceneAction == 'push' then
     self.nextSceneAction = nil
     self.sceneStack:push(self.nextScene)
-    self.nextScene:enter(unpack(self.nextSceneArgs))
+    self.nextScene:enter(table.unpack(self.nextSceneArgs, 1, self.nextSceneArgs.n))
+
   elseif self.nextSceneAction == 'pop' then
     self.nextSceneAction = nil
     local oldScene = self.sceneStack:pop()
@@ -85,7 +103,7 @@ function SceneManager:update(dt)
 
     oldScene:leave()
 
-    -- Whatever our current is needs to be setActive.
+    -- Current scene needs to be setActive.
     current = self.sceneStack:top()
     if current == nil then
       log.error('No scene on stack!')
@@ -96,9 +114,54 @@ function SceneManager:update(dt)
   end
 end
 
-function SceneManager:draw()
+function SceneManager:keypressed(key, scancode, isRepeat)
   local current = self.sceneStack:top()
-  if current then current:draw() end
+  if current then
+    current:keypressed(key, scancode, isRepeat)
+  end
+end
+
+function SceneManager:keyreleased(key, scancode)
+  local current = self.sceneStack:top()
+  if current then
+    current:keyreleased(key, scancode)
+  end
+end
+
+function SceneManager:gamepadpressed(joystick, button)
+  local current = self.sceneStack:top()
+  if current then
+    current:gamepadpressed(joystick, button)
+  end
+end
+
+
+function SceneManager:gamepadreleased(joystick, button)
+  local current = self.sceneStack:top()
+  if current then
+    current:gamepadreleased(joystick, button)
+  end
+end
+
+function SceneManager:mousemoved(x, y, dx, dy, istouch)
+  local current = self.sceneStack:top()
+  if current then
+    current:mousemoved(x, y, dx, dy, istouch)
+  end
+end
+
+function SceneManager:mousepressed(x, y, button, istouch)
+  local current = self.sceneStack:top()
+  if current then
+    current:mousepressed(x, y, button, istouch)
+  end
+end
+
+function SceneManager:mousereleased(x, y, button, istouch)
+  local current = self.sceneStack:top()
+  if current then
+    current:mousereleased(x, y, button, istouch)
+  end
 end
 
 return SceneManager
