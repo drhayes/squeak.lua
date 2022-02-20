@@ -2,10 +2,6 @@ local Scene = require 'squeak.scene'
 local EventEmitter = require 'squeak.eventEmitter'
 
 describe('Scene', function()
-  it('works at all', function()
-    assert.are.equal('table', type(Scene))
-  end)
-
   it('provides a shortcut for subscribing to events', function()
     local eventBus = EventEmitter()
     local scene = Scene(nil, eventBus)
@@ -16,6 +12,10 @@ describe('Scene', function()
       randomEventCalled = true
     end
     scene:subscribe('randomEvent', scene.onRandomEvent)
+    eventBus:emit('randomEvent', 'cats')
+    assert.falsy(randomEventCalled)
+    -- Now enter the scene, and it'll be subscribed.
+    scene:enter()
     eventBus:emit('randomEvent', 'cats')
     assert.truthy(randomEventCalled)
   end)

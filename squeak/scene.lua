@@ -1,4 +1,4 @@
-local Object = require 'classic'
+local Object = require 'lib.classic'
 
 local Scene = Object:extend()
 
@@ -23,6 +23,27 @@ function Scene:update(dt) end
 
 -- Core loop, called to draw everything.
 function Scene:draw() end
+
+-- Called on key press.
+function Scene:keypressed(key, scancode, isRepeat) end
+
+-- Called on key release.
+function Scene:keyreleased(key, scancode) end
+
+-- Called on gamepad pressed.
+function Scene:gamepadpressed(joystick, button) end
+
+-- Called on gamepad released.
+function Scene:gamepadreleased(joystick, button) end
+
+-- Called on gamepad released.
+function Scene:mousemoved(x, y, dx, dy, istouch) end
+
+-- Called on gamepad released.
+function Scene:mousepressed(x, y, button, istouch) end
+
+-- Called on gamepad released.
+function Scene:mousereleased(x, y, button, istouch) end
 
 -- Called every time the scene is left (in a switch or a push)
 function Scene:leave()
