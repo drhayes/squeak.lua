@@ -1,7 +1,7 @@
 local Object = require 'lib.classic'
 local lume = require 'lib.lume'
 local PATH = (...):gsub('%.[^%.]+$', '')
-local Coroutine = require(PATH .. '.coroutine')
+local Coroutine = require(PATH .. '.components.coroutine')
 
 local CoroutineList = Object:extend()
 

@@ -2,7 +2,7 @@ local log = require 'lib.log'
 -- Don't log anything please.
 log.level = 'fatal'
 
-local Coroutine = require 'squeak.coroutine'
+local Coroutine = require 'squeak.components.coroutine'
 
 describe('Coroutine', function()
 
