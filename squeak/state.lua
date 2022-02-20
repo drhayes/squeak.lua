@@ -1,9 +1,9 @@
-local Object = require 'classic'
+local Object = require 'lib.classic'
 
 local State = Object:extend()
 
 function State:enter() end
-function State:update(dt) end
+function State:update(dt, event) end
 function State:draw() end
 function State:leave() end
 

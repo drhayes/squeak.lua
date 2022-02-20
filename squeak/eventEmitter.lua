@@ -1,4 +1,4 @@
-local Object = require 'classic'
+local Object = require 'lib.classic'
 
 local function push (t, ...)
   local pushed = select('#', ...)
@@ -27,16 +27,27 @@ function EventEmitter:emit(eventName, ...)
     local sub = subscriptions[i]
     local ok, message
 
-    if sub.args then
-      local n = push(sub.args, ...)
-      ok, message = pcall(sub.listener, unpack(sub.args, 1, n))
-      clean(sub.args, n)
-    else
-      ok, message = pcall(sub.listener, ...)
-    end
+    -- If this subscription was removed this update cycle then
+    -- don't call its listeners.
+    if not sub.removeMe then
+      if sub.args then
+        local n = push(sub.args, ...)
+        ok, message = pcall(sub.listener, unpack(sub.args, 1, n))
+        clean(sub.args, n)
+      else
+        ok, message = pcall(sub.listener, ...)
+      end
 
-    if not ok then
-      log.error(eventName, message)
+      if not ok then
+        log.error(eventName, message)
+      end
+    end
+  end
+
+  for i = #subscriptions, 1, -1 do
+    local sub = subscriptions[i]
+    if sub.removeMe then
+      table.remove(subscriptions, i)
     end
   end
 end
@@ -74,8 +85,10 @@ function EventEmitter:off(eventName, listener)
   local subscriptions = self.subscribers[eventName]
   for i = 1, #subscriptions do
     local sub = subscriptions[i]
-    if sub.listener == listener then
-      table.remove(subscriptions, i)
+    -- Is this the listener we're looking for?
+    -- And it's not one that we're already removing?
+    if sub.listener == listener and not sub.removeMe then
+      sub.removeMe = true
       break
     end
   end
