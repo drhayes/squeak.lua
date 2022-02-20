@@ -1,7 +1,7 @@
-local Object = require 'classic'
+local Object = require 'lib.classic'
 local PATH = (...):gsub('%.[^%.]+$', '')
 local EventEmitter = require(PATH .. '.eventEmitter')
-local lume = require 'lume'
+local lume = require 'lib.lume'
 
 
 local GobsList = Object:extend()
@@ -63,10 +63,12 @@ end
 
 function GobsList:add(gob)
   table.insert(self.additions, gob)
+  return gob
 end
 
 function GobsList:remove(gob)
   table.insert(self.removals, gob)
+  return gob
 end
 
 function GobsList:clear()
@@ -83,6 +85,20 @@ function GobsList:findFirst(gobType)
     local gob = self.gobs[i]
     if gob:is(gobType) then
       return gob
+    end
+  end
+end
+
+function GobsList:gobAtPos(x, y)
+  for i = 1, #self.gobs do
+    local gob = self.gobs[i]
+    -- Only do this for GameObjects that have widths and heights.
+    if gob.width and gob.height then
+      local left, top = gob.x, gob.y
+      local right, bottom = gob.x + gob.width, gob.y + gob.height
+      if x >= left and x <= right and y >= top and y <= bottom then
+        return gob
+      end
     end
   end
 end

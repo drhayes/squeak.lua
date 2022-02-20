@@ -1,20 +1,13 @@
 local GobsList = require 'squeak.gobsList'
-local EventEmitter = require 'squeak.eventEmitter'
 local GameObject = require 'squeak.gameObject'
 
 local CustomGameObject = GameObject:extend()
 
 describe('gobsList', function()
-  local eventBus
   local gobs
 
   before_each(function()
-    eventBus = EventEmitter()
-    gobs = GobsList(eventBus)
-  end)
-
-  it('works at all', function()
-    assert.are.equal('table', type(GobsList))
+    gobs = GobsList()
   end)
 
   it('adds and removes game objects during update cycle', function()
