@@ -1,11 +1,12 @@
 local PATH = (...):gsub('%.init$', '')
 
 local Squeak = {
-   _VERSION     = '1.0',
+   _VERSION     = '1.1.0',
    _DESCRIPTION = 'A small, opinionated game framework.',
    _LICENCE     = [[
       MIT LICENSE
-      Copyright (c) 2020 David R. Hayes
+      Copyright (c) 2020-2022 David R. Hayes
+
       Permission is hereby granted, free of charge, to any person obtaining a
       copy of this software and associated documentation files (the
       "Software"), to deal in the Software without restriction, including
@@ -26,7 +27,7 @@ local Squeak = {
 }
 
 Squeak.component = require(PATH..'.component')
-Squeak.coroutine = require(PATH .. '.coroutine')
+Squeak.components = require(PATH..'.components')
 Squeak.coroutineList = require(PATH .. '.coroutineList')
 Squeak.eventEmitter = require(PATH..'.eventEmitter')
 Squeak.gameObject = require(PATH..'.gameObject')
@@ -34,6 +35,7 @@ Squeak.gobsList = require(PATH..'.gobsList')
 Squeak.registry = require(PATH .. '.registry')
 Squeak.scene = require(PATH .. '.scene')
 Squeak.sceneManager = require(PATH .. '.sceneManager')
+Squeak.stack = require(PATH .. '.stack')
 Squeak.state = require(PATH..'.state')
 Squeak.stateMachine = require(PATH..'.stateMachine')
 
