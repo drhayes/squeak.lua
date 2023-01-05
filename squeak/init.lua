@@ -1,11 +1,11 @@
 local PATH = (...):gsub('%.init$', '')
 
 local Squeak = {
-  _VERSION     = '1.1.0',
+  _VERSION     = '2.0.0',
   _DESCRIPTION = 'A small, opinionated game framework.',
   _LICENCE     = [[
       MIT LICENSE
-      Copyright (c) 2020-2022 David R. Hayes
+      Copyright (c) 2020-2023 David R. Hayes
 
       Permission is hereby granted, free of charge, to any person obtaining a
       copy of this software and associated documentation files (the
