@@ -1,4 +1,4 @@
-local PATH = (...):gsub('%.[^%.]+$', '')
+local PATH = (...):gsub('%.components%.[^%.]+$', '')
 local Component = require(PATH .. '.component')
 local EventEmitter = require(PATH .. '.eventEmitter')
 

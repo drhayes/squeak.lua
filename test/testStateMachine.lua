@@ -1,5 +1,5 @@
-local StateMachine = require 'squeak.stateMachine'
-local State = require 'squeak.state'
+local StateMachine = require 'squeak.components.stateMachine'
+local State = require 'squeak.components.state'
 
 describe('StateMachine', function()
   local function create()
