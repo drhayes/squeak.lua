@@ -10,6 +10,7 @@ function GobsList:new(gobCompare)
   self.gobCompare = gobCompare
   self.events = EventEmitter()
   self.gobs = {}
+  self.gobsById = {}
   self.additions = {}
   self.removals = {}
 end
@@ -28,36 +29,60 @@ function GobsList:update(dt)
 
   -- Process additions.
   local additions = self.additions
+  self.additions = {}
   for i = 1, #additions do
     local gob = additions[i]
     table.insert(self.gobs, gob)
-    gob:gobAdded()
-    self.events:emit('gobAdded', gob)
+    if gob.id then
+      self.gobsById[gob.id] = gob
+    end
+    gob.parent = self
   end
   if #additions > 0 then
+    -- Sort the new additions.
     if self.gobCompare then
       table.sort(self.gobs, self.gobCompare)
     end
-    lume.clear(self.additions)
+
+    -- Run the new additions gobAdded events, all at once.
+    for i = 1, #additions do
+      local gob = additions[i]
+      gob:gobAdded()
+      self.events:emit('gobAdded', gob)
+    end
   end
 
   -- Process removals.
   local removals = self.removals
+  self.removals = {}
   for i = 1, #removals do
     local gob = removals[i]
     lume.remove(self.gobs, gob)
-    gob:gobRemoved()
-    self.events:emit('gobRemoved', gob)
+    if gob.id then
+      self.gobsById[gob.id] = nil
+    end
   end
   if #removals > 0 then
-    lume.clear(self.removals)
+    -- Run the removals all at once.
+    for i = 1, #removals do
+      local gob = removals[i]
+      gob.parent = nil
+      gob:gobRemoved()
+      self.events:emit('gobRemoved', gob)
+    end
   end
 end
 
-function GobsList:draw()
+function GobsList:draw(filterIn, filterOut)
   for i = 1, #self.gobs do
     local gob = self.gobs[i]
-    gob:draw()
+    if filterIn and gob.layer == filterIn then
+      gob:draw()
+    elseif filterOut and gob.layer ~= filterOut then
+      gob:draw()
+    elseif not filterIn and not filterOut then
+      gob:draw()
+    end
   end
 end
 
@@ -77,6 +102,7 @@ function GobsList:clear()
     gob:gobRemoved()
   end
   lume.clear(self.gobs)
+  lume.clear(self.gobsById)
   self.events:emit('gobsCleared')
 end
 
@@ -103,8 +129,48 @@ function GobsList:gobAtPos(x, y)
   end
 end
 
+function GobsList:byId(id)
+  local gob = self.gobsById[id]
+  if not gob then
+    log.warn('no gob found by that id', id)
+  end
+  return gob
+end
+
+function GobsList:query(pred, matchedGobs)
+  matchedGobs = matchedGobs or {}
+  for i = 1, #self.gobs do
+    local gob = self.gobs[i]
+    if pred(gob) then
+      table.insert(matchedGobs, gob)
+    end
+  end
+  return matchedGobs
+end
+
+function GobsList:queryByComponent(componentType, fn)
+  for i = 1, #self.gobs do
+    local gob = self.gobs[i]
+    if gob:findFirst(componentType) then
+      -- Return true to early exit.
+      local result = fn(gob)
+      if result == true then
+        return
+      end
+    end
+  end
+end
+
 function GobsList:on(...)
   self.events:on(...)
+end
+
+function GobsList:off(...)
+  self.events:off(...)
+end
+
+function GobsList:__tostring()
+  return 'GobsList'
 end
 
 return GobsList

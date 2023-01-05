@@ -39,7 +39,7 @@ function EventEmitter:emit(eventName, ...)
       end
 
       if not ok then
-        log.error(eventName, message)
+        log.error('event: ' .. eventName .. ',', debug.traceback(message))
       end
     end
   end

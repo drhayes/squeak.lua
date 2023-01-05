@@ -7,46 +7,53 @@ local Cooldowns = Component:extend()
 
 function Cooldowns:new()
   Cooldowns.super.new(self)
-  self.list = {}
+  self.map = {}
 end
 
 function Cooldowns:get(key)
-  for i = 1, #self.list do
-    local cooldown = self.list[i]
-    if cooldown.key == key then
-      return cooldown
-    end
-  end
-  return nil
+  return self.map[key]
 end
 
 function Cooldowns:set(key, seconds, callback, callbackArg)
-  table.insert(self.list, {
-    key = key,
+  -- If calling set on a cooldown that already exists, reset its time.
+  if self.map[key] then
+    local cooldown = self.map[key]
+    cooldown.seconds = seconds
+    return
+  end
+
+  self.map[key] = {
     seconds = seconds,
+    originalSeconds = seconds,
     callback = callback,
     callbackArg = callbackArg,
-  })
+  }
+end
+
+function Cooldowns:reset(key)
+  if self.map[key] then
+    self.map[key].seconds = self.map[key].originalSeconds
+  end
+end
+
+function Cooldowns:unset(key)
+  self.map[key] = nil
 end
 
 function Cooldowns:has(key)
-  return self:get(key) ~= nil
+  return self.map[key] ~= nil
 end
 
 function Cooldowns:update(dt)
   Cooldowns.super.update(self, dt)
 
-  local i = 1
-  while i <= #self.list do
-    local cooldown = self.list[i]
+  for key, cooldown in pairs(self.map) do
     cooldown.seconds = cooldown.seconds - dt
     if cooldown.seconds <= 0 then
       if cooldown.callback then
         cooldown.callback(cooldown.callbackArg)
       end
-      table.remove(self.list, i)
-    else
-      i = i + 1
+      self.map[key] = nil
     end
   end
 end

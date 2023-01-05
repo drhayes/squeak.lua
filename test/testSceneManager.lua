@@ -1,12 +1,14 @@
 local SceneManager = require 'squeak.sceneManager'
 local Scene = require 'squeak.scene'
+local EventEmitter = require 'squeak.eventEmitter'
 
 describe('SceneManager', function()
   local scene, sm
 
   before_each(function()
     scene = Scene()
-    sm = SceneManager()
+    local eventBus = EventEmitter()
+    sm = SceneManager(eventBus)
   end)
 
   it('can add scenes', function()

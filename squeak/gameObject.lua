@@ -65,7 +65,7 @@ function GameObject:draw()
     local component = self.components[i]
     if component.active then
       component:draw()
-      -- component:debugDraw()
+      component:debugDraw()
     end
   end
 end
@@ -83,6 +83,16 @@ function GameObject:gobRemoved()
   for i = 1, #self.components do
     local component = self.components[i]
     component:gobRemoved()
+  end
+end
+
+-- Called to send all the Components a message.
+function GameObject:sendMessage(message, ...)
+  for i = 1, #self.components do
+    local component = self.components[i]
+    if component.active then
+      component:onMessage(message, ...)
+    end
   end
 end
 

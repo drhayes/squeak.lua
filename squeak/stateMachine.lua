@@ -44,6 +44,11 @@ function StateMachine:fireEvent(eventName)
     error('Illegal event fired: ' .. eventName)
   end
 
+  -- Are we in a state yet?
+  if not self.current then
+    error('Tried to fire event with no current state: ' .. eventName)
+  end
+
   -- Can we transition to another state based on this event?
   -- It's fine if we can't, just ignore in that case.
   local nextState = self.transitionTable[self.current][eventName]
@@ -51,10 +56,15 @@ function StateMachine:fireEvent(eventName)
     return
   end
 
+  if not self.stateNames[nextState] then
+    error('Illegal state name: ' .. nextState)
+  end
+
   local currentState = self.states[self.current]
   currentState:leave()
 
   self.events:emit(eventName)
+
 
   self.current = nextState
   self.states[self.current]:enter()
@@ -85,9 +95,11 @@ function StateMachine:gobAdded()
   StateMachine.super.gobAdded(self)
   -- Are we missing any states?
   for stateName, _ in pairs(self.stateNames) do
-    if not self.states[stateName] then
+    local state = self.states[stateName]
+    if not state then
       error('Missing state ' .. stateName .. ' declared in transition table')
     end
+    state.gob = self.parent
   end
 
   if not self.current then
@@ -111,6 +123,13 @@ end
 
 function StateMachine:isInState(name)
   return self.current == self.states[name]
+end
+
+function StateMachine:onMessage(message, ...)
+  StateMachine.super.onMessage(self, message, ...)
+
+  if not self.current then return end
+  self.states[self.current]:onMessage(self.boundFireEvent, message, ...)
 end
 
 function StateMachine:__tostring()

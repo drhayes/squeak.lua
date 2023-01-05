@@ -8,10 +8,9 @@ function Follow:new(gob, offsetX, offsetY)
   Follow.super.new(self)
 
   self.gob = gob
-  self.offsetX = offsetX
-  self.offsetY = offsetY
+  self.offsetX = offsetX or 0
+  self.offsetY = offsetY or 0
 end
-
 
 function Follow:update(dt)
   Follow.super.update(self, dt)
@@ -19,10 +18,8 @@ function Follow:update(dt)
   self.parent.y = self.gob.y + self.offsetY
 end
 
-
 function Follow:__tostring()
   return 'Follow'
 end
 
 return Follow
-

@@ -8,7 +8,8 @@ table.unpack = table.unpack or unpack
 
 local SceneManager = Object:extend()
 
-function SceneManager:new()
+function SceneManager:new(eventBus)
+  self.eventBus = eventBus
   self.scenes = {}
   self.sceneStack = Stack()
   -- This is one of 'push', 'pop', or 'switch'.
@@ -29,6 +30,10 @@ function SceneManager:get(name)
     log.error('tried to get nonexistent scene', name)
   end
   return scene
+end
+
+function SceneManager:current()
+  return self.sceneStack:top()
 end
 
 function SceneManager:switch(newSceneName, ...)
@@ -86,11 +91,13 @@ function SceneManager:draw()
 
     -- This scene is the current. Enter it.
     self.sceneStack:push(self.nextScene)
+    self.eventBus:emit('beforeSceneChange', self.nextScene)
     self.nextScene:enter(table.unpack(self.nextSceneArgs, 1, self.nextSceneArgs.n))
 
   elseif self.nextSceneAction == 'push' then
     self.nextSceneAction = nil
     self.sceneStack:push(self.nextScene)
+    self.eventBus:emit('beforeSceneChange', self.nextScene)
     self.nextScene:enter(table.unpack(self.nextSceneArgs, 1, self.nextSceneArgs.n))
 
   elseif self.nextSceneAction == 'pop' then
@@ -110,7 +117,15 @@ function SceneManager:draw()
       error('No scene on stack!')
     end
 
+    self.eventBus:emit('beforeSceneChange', current)
     current:restore()
+  end
+end
+
+function SceneManager:resize(w, h)
+  local current = self.sceneStack:top()
+  if current then
+    current:resize(w, h)
   end
 end
 
@@ -162,6 +177,12 @@ function SceneManager:mousereleased(x, y, button, istouch)
   if current then
     current:mousereleased(x, y, button, istouch)
   end
+end
+
+function SceneManager:inScene(sceneName)
+  local currentScene = self:current()
+  local thatScene = self:get(sceneName)
+  return currentScene == thatScene
 end
 
 return SceneManager
