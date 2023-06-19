@@ -206,6 +206,13 @@ describe('process', function()
     assert.equal(1, #Process.roots)
   end)
 
+  it('calls the dispose callback on dispose', function()
+    local p1 = Process()
+    p1.onDispose = spy.new(function() end)
+    Process.dispose(p1)
+    assert.spy(p1.onDispose).was.called(1)
+  end)
+
   it('kills its children on dispose', function()
     local p1 = Process()
     local p2 = Process(p1)

@@ -101,11 +101,13 @@ function Process.dispose(process)
   else
     lume.remove(Process.roots, process)
   end
+  process.onDispose()
 end
 
 function Process:preUpdate(dt) end
 function Process:update(dt) end
 function Process:postUpdate(dt) end
+function Process:onDispose() end
 
 Process.roots = {}
 
