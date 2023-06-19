@@ -4,6 +4,7 @@ local lume = require('lib.lume')
 local Process = Object:extend()
 
 function Process:new(parent)
+  self.dead = false
   self.childProcesses = {}
   self.parent = nil
   self.enabled = true
@@ -35,7 +36,7 @@ function Process:detach(child)
 end
 
 function Process:canRun()
-  return self.enabled
+  return self.enabled and not self.dead
 end
 
 function Process.runPreUpdate(p, dt)
@@ -68,6 +69,37 @@ function Process.runPostUpdate(p, dt)
   for i = 1, #childProcesses do
     local childProcess = childProcesses[i]
     Process.runPostUpdate(childProcess, dt)
+  end
+end
+
+function Process:die()
+  self.dead = true
+end
+
+function Process.cleanup(processes)
+  processes = processes or Process.roots
+  local i = 1
+  while i <= #processes do
+    local p = processes[i]
+    if p.dead then
+      Process.dispose(p)
+    else
+      Process.cleanup(p.childProcesses)
+      i = i + 1
+    end
+  end
+end
+
+function Process.dispose(process)
+  local childProcesses = process.childProcesses
+  for i = 1, #childProcesses do
+    childProcesses[i]:die()
+  end
+  Process.cleanup(childProcesses)
+  if process.parent ~= nil then
+    lume.remove(process.parent.childProcesses, process)
+  else
+    lume.remove(Process.roots, process)
   end
 end
 
