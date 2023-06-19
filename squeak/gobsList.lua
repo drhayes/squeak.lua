@@ -1,8 +1,7 @@
-local Object = require 'lib.classic'
+local Object = require('lib.classic')
 local PATH = (...):gsub('%.[^%.]+$', '')
 local EventEmitter = require(PATH .. '.eventEmitter')
-local lume = require 'lib.lume'
-
+local lume = require('lib.lume')
 
 local GobsList = Object:extend()
 
@@ -15,6 +14,16 @@ function GobsList:new(gobCompare)
   self.removals = {}
 end
 
+function GobsList:preUpdate(dt)
+  local gobs = self.gobs
+
+  -- Preupdate'em.
+  for i = 1, #gobs do
+    local gob = gobs[i]
+    gob:preUpdate(dt)
+  end
+end
+
 function GobsList:update(dt)
   local gobs = self.gobs
 
@@ -22,9 +31,27 @@ function GobsList:update(dt)
   for i = 1, #gobs do
     local gob = gobs[i]
     gob:update(dt)
-    if gob.removeMe then
-      self:remove(gob)
-    end
+  end
+end
+
+function GobsList:physicsUpdate(dt)
+  local gobs = self.gobs
+
+  -- Update'em.
+  for i = 1, #gobs do
+    local gob = gobs[i]
+    gob:physicsUpdate(dt)
+  end
+end
+
+function GobsList:postUpdate(dt)
+  local gobs = self.gobs
+
+  -- Postupdate'em.
+  for i = 1, #gobs do
+    local gob = gobs[i]
+    gob:postUpdate(dt)
+    if gob.removeMe then self:remove(gob) end
   end
 
   -- Process additions.
@@ -33,16 +60,12 @@ function GobsList:update(dt)
   for i = 1, #additions do
     local gob = additions[i]
     table.insert(self.gobs, gob)
-    if gob.id then
-      self.gobsById[gob.id] = gob
-    end
+    if gob.id then self.gobsById[gob.id] = gob end
     gob.parent = self
   end
   if #additions > 0 then
     -- Sort the new additions.
-    if self.gobCompare then
-      table.sort(self.gobs, self.gobCompare)
-    end
+    if self.gobCompare then table.sort(self.gobs, self.gobCompare) end
 
     -- Run the new additions gobAdded events, all at once.
     for i = 1, #additions do
@@ -58,9 +81,7 @@ function GobsList:update(dt)
   for i = 1, #removals do
     local gob = removals[i]
     lume.remove(self.gobs, gob)
-    if gob.id then
-      self.gobsById[gob.id] = nil
-    end
+    if gob.id then self.gobsById[gob.id] = nil end
   end
   if #removals > 0 then
     -- Run the removals all at once.
@@ -109,9 +130,7 @@ end
 function GobsList:findFirst(gobType)
   for i = 1, #self.gobs do
     local gob = self.gobs[i]
-    if gob:is(gobType) then
-      return gob
-    end
+    if gob:is(gobType) then return gob end
   end
 end
 
@@ -122,18 +141,14 @@ function GobsList:gobAtPos(x, y)
     if gob.width and gob.height then
       local left, top = gob.x, gob.y
       local right, bottom = gob.x + gob.width, gob.y + gob.height
-      if x >= left and x <= right and y >= top and y <= bottom then
-        return gob
-      end
+      if x >= left and x <= right and y >= top and y <= bottom then return gob end
     end
   end
 end
 
 function GobsList:byId(id)
   local gob = self.gobsById[id]
-  if not gob then
-    log.warn('no gob found by that id', id)
-  end
+  if not gob then log.warn('no gob found by that id', id) end
   return gob
 end
 
@@ -141,9 +156,7 @@ function GobsList:query(pred, matchedGobs)
   matchedGobs = matchedGobs or {}
   for i = 1, #self.gobs do
     local gob = self.gobs[i]
-    if pred(gob) then
-      table.insert(matchedGobs, gob)
-    end
+    if pred(gob) then table.insert(matchedGobs, gob) end
   end
   return matchedGobs
 end
@@ -154,9 +167,7 @@ function GobsList:queryByComponent(componentType, fn)
     if gob:findFirst(componentType) then
       -- Return true to early exit.
       local result = fn(gob)
-      if result == true then
-        return
-      end
+      if result == true then return end
     end
   end
 end

@@ -1,5 +1,5 @@
-local Object = require 'lib.classic'
-local lume = require 'lib.lume'
+local Object = require('lib.classic')
+local lume = require('lib.lume')
 
 local GameObject = Object:extend()
 
@@ -19,9 +19,7 @@ function GameObject:has(componentType)
   -- local componentType = getmetatable(component)
   for i = 1, #self.components do
     local component = self.components[i]
-    if component:is(componentType) then
-      return true
-    end
+    if component:is(componentType) then return true end
   end
   return false
 end
@@ -29,9 +27,7 @@ end
 function GameObject:findFirst(componentType)
   for i = 1, #self.components do
     local component = self.components[i]
-    if component:is(componentType) then
-      return component
-    end
+    if component:is(componentType) then return component end
   end
 end
 
@@ -40,18 +36,54 @@ function GameObject:remove(component)
   component:removed()
 end
 
-function GameObject:update(dt)
+function GameObject:init()
   local removals = self.removals
   lume.clear(removals)
+  -- Initialize.
+  for i = 1, #self.components do
+    local component = self.components[i]
+    if component.active then component:init() end
+    if component.removeMe then table.insert(removals, component) end
+  end
+  -- Remove.
+  for i = 1, #removals do
+    local component = removals[i]
+    self:remove(component)
+  end
+end
+
+function GameObject:preUpdate(dt)
+  lume.clear(self.removals)
   -- Update.
   for i = 1, #self.components do
     local component = self.components[i]
-    if component.active then
-      component:update(dt)
-    end
-    if component.removeMe then
-      table.insert(removals, component)
-    end
+    if component.active then component:preUpdate(dt) end
+  end
+end
+
+function GameObject:update(dt)
+  -- Update.
+  for i = 1, #self.components do
+    local component = self.components[i]
+    if component.active then component:update(dt) end
+  end
+end
+
+function GameObject:physicsUpdate(dt)
+  -- Update.
+  for i = 1, #self.components do
+    local component = self.components[i]
+    if component.active then component:physicsUpdate(dt) end
+  end
+end
+
+function GameObject:postUpdate(dt)
+  local removals = self.removals
+  -- Update.
+  for i = 1, #self.components do
+    local component = self.components[i]
+    if component.active then component:postUpdate(dt) end
+    if component.removeMe then table.insert(removals, component) end
   end
   -- Remove.
   for i = 1, #removals do
@@ -87,13 +119,18 @@ function GameObject:gobRemoved()
 end
 
 -- Called to send all the Components a message.
+-- TODO: Consider using a message queue.
+-- Calls to sendMessage during message handlers would be queued up and processed later.
 function GameObject:sendMessage(message, ...)
+  if self.removeMe then return end
+  self:onMessage(message, ...)
   for i = 1, #self.components do
     local component = self.components[i]
-    if component.active then
-      component:onMessage(message, ...)
-    end
+    if component.active then component:onMessage(message, ...) end
   end
 end
+
+-- Receive a message.
+function GameObject:onMessage(message, ...) end
 
 return GameObject

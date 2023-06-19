@@ -1,6 +1,6 @@
 local PATH = (...):gsub('%.components%.[^%.]+$', '')
 local Component = require(PATH .. '.component')
-local log = require 'lib.log'
+local log = require('lib.log')
 
 local Coroutine = Component:extend()
 
@@ -17,11 +17,10 @@ function Coroutine:update(dt)
   local co = self.coroutine
   local ok, message = coroutine.resume(co, self, dt)
   if not ok then
-    log.error(message)
+    log.error(message, self.parent)
+    log.error(coroutine.status(co))
   end
-  if coroutine.status(co) == 'dead' then
-    self.removeMe = true
-  end
+  if coroutine.status(co) == 'dead' then self.removeMe = true end
 end
 
 function Coroutine:wait(limit)
