@@ -24,6 +24,16 @@ function Process:attach(child)
   table.insert(self.childProcesses, child)
 end
 
+function Process:detach(child)
+  if child.parent ~= self then
+    log.error('Trying to detach a child process that is not attached to this process: ' .. child)
+    return
+  end
+  lume.remove(self.childProcesses, child)
+  child.parent = nil
+  table.insert(Process.roots, child)
+end
+
 function Process:canRun()
   return self.enabled
 end
@@ -31,6 +41,7 @@ end
 function Process.runPreUpdate(p, dt)
   if not p:canRun() then return end
   p:preUpdate(dt)
+  if not p:canRun() then return end
   local childProcesses = p.childProcesses
   for i = 1, #childProcesses do
     local childProcess = childProcesses[i]
@@ -41,6 +52,7 @@ end
 function Process.runUpdate(p, dt)
   if not p:canRun() then return end
   p:update(dt)
+  if not p:canRun() then return end
   local childProcesses = p.childProcesses
   for i = 1, #childProcesses do
     local childProcess = childProcesses[i]
@@ -51,6 +63,7 @@ end
 function Process.runPostUpdate(p, dt)
   if not p:canRun() then return end
   p:postUpdate(dt)
+  if not p:canRun() then return end
   local childProcesses = p.childProcesses
   for i = 1, #childProcesses do
     local childProcess = childProcesses[i]

@@ -128,4 +128,53 @@ describe('process', function()
     assert.spy(p2.postUpdate).was.called(1)
     assert.spy(p3.postUpdate).was.called(2)
   end)
+
+  it('will not run children if enabled is false after preUpdate', function()
+    local p1 = Process()
+    local p2 = Process(p1)
+    p1.preUpdate = function()
+      p1.enabled = false
+    end
+    p2.preUpdate = spy.new(function() end)
+    Process.runPreUpdate(p1, 1)
+    assert.falsy(p1.enabled)
+    assert.truthy(p2.enabled)
+    assert.spy(p2.preUpdate).called(0)
+  end)
+
+  it('will not run children if enabled is false after update', function()
+    local p1 = Process()
+    local p2 = Process(p1)
+    p1.update = function()
+      p1.enabled = false
+    end
+    p2.update = spy.new(function() end)
+    Process.runUpdate(p1, 1)
+    assert.falsy(p1.enabled)
+    assert.truthy(p2.enabled)
+    assert.spy(p2.update).called(0)
+  end)
+
+  it('will not run children if enabled is false after postUpdate', function()
+    local p1 = Process()
+    local p2 = Process(p1)
+    p1.postUpdate = function()
+      p1.enabled = false
+    end
+    p2.postUpdate = spy.new(function() end)
+    Process.runPostUpdate(p1, 1)
+    assert.falsy(p1.enabled)
+    assert.truthy(p2.enabled)
+    assert.spy(p2.postUpdate).called(0)
+  end)
+
+  it('can detach child processes', function()
+    local p1 = Process()
+    local p2 = Process(p1)
+    assert.equal(1, #p1.childProcesses)
+    assert.equal(1, #Process.roots)
+    p1:detach(p2)
+    assert.equal(0, #p1.childProcesses)
+    assert.equal(2, #Process.roots)
+  end)
 end)
