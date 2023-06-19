@@ -118,6 +118,23 @@ function Process.dispose(process)
   process.onDispose()
 end
 
+function Process.run(dt)
+  local processes = Process.roots
+  for i = 1, #processes do
+    local p = processes[i]
+    Process.runPreUpdate(p, dt)
+  end
+  for i = 1, #processes do
+    local p = processes[i]
+    Process.runUpdate(p, dt)
+  end
+  for i = 1, #processes do
+    local p = processes[i]
+    Process.runPostUpdate(p, dt)
+  end
+  Process.cleanup()
+end
+
 function Process:preUpdate(dt) end
 function Process:update(dt) end
 function Process:postUpdate(dt) end
