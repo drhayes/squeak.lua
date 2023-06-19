@@ -1,5 +1,5 @@
-local GameObject = require 'squeak.gameObject'
-local Component = require 'squeak.component'
+local GameObject = require('squeak.gameObject')
+local Component = require('squeak.component')
 
 local TestComponent = Component:extend()
 
@@ -28,7 +28,9 @@ describe('gameObject', function()
 
   it('can add components', function()
     local addedCalled = false
-    c.added = function() addedCalled = true end
+    c.added = function()
+      addedCalled = true
+    end
     local c2 = g:add(c)
     assert.are.equal(1, #g.components)
     assert.is_true(addedCalled)
@@ -42,7 +44,9 @@ describe('gameObject', function()
 
   it('can remove previously added components', function()
     local removedCalled = false
-    c.removed = function() removedCalled = true end
+    c.removed = function()
+      removedCalled = true
+    end
     g:add(c)
     assert.are.equal(1, #g.components)
     g:remove(c)
@@ -52,7 +56,9 @@ describe('gameObject', function()
 
   it('calls gobAdded on its components', function()
     local gobAddedCalled = false
-    c.gobAdded = function() gobAddedCalled = true end
+    c.gobAdded = function()
+      gobAddedCalled = true
+    end
     g:add(c)
     g:gobAdded()
     assert.is_true(gobAddedCalled)
@@ -60,7 +66,9 @@ describe('gameObject', function()
 
   it('calls gobRemoved on its components', function()
     local gobRemovedCalled = false
-    c.gobRemoved = function() gobRemovedCalled = true end
+    c.gobRemoved = function()
+      gobRemovedCalled = true
+    end
     g:add(c)
     g:gobRemoved()
     assert.is_true(gobRemovedCalled)
@@ -68,7 +76,9 @@ describe('gameObject', function()
 
   it('calls draw on its components', function()
     local drawCalled = false
-    c.draw = function() drawCalled = true end
+    c.draw = function()
+      drawCalled = true
+    end
     g:add(c)
     g:draw()
     assert.is_true(drawCalled)
@@ -86,7 +96,9 @@ describe('gameObject', function()
     it('updates active components', function()
       c.active = true
       local updateCalled = false
-      c.update = function() updateCalled = true end
+      c.update = function()
+        updateCalled = true
+      end
       g:update()
       assert.is_true(updateCalled)
     end)
@@ -94,20 +106,26 @@ describe('gameObject', function()
     it('does not update inactive components', function()
       c.active = false
       local updateCalled = false
-      c.update = function() updateCalled = true end
+      c.update = function()
+        updateCalled = true
+      end
       g:update()
       assert.is_false(updateCalled)
     end)
 
-    it('removes components marked for removal after update', function()
+    it('removes components marked for removal after postUpdate', function()
       assert.are.equal(1, #g.components)
       local order = {}
-      c.update = function() table.insert(order, 'update') end
-      c.removed = function() table.insert(order, 'removed') end
+      c.postUpdate = function()
+        table.insert(order, 'postUpdate')
+      end
+      c.removed = function()
+        table.insert(order, 'removed')
+      end
       c.removeMe = true
-      g:update()
+      g:postUpdate()
       assert.are.equal(0, #g.components)
-      assert.are.equal('update', order[1])
+      assert.are.equal('postUpdate', order[1])
       assert.are.equal('removed', order[2])
     end)
 
@@ -115,9 +133,13 @@ describe('gameObject', function()
       local c2 = TestComponent()
       local cUpdate = 0
       local c2Update = 0
-      c.update = function() cUpdate = cUpdate + 1 end
+      c.update = function()
+        cUpdate = cUpdate + 1
+      end
       c.removeMe = true
-      c2.update = function() c2Update = c2Update + 1 end
+      c2.update = function()
+        c2Update = c2Update + 1
+      end
       g:add(c2)
       g:update()
       assert.are.equal(1, cUpdate)
