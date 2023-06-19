@@ -39,6 +39,18 @@ function Process:canRun()
   return self.enabled and not self.dead
 end
 
+function Process:pause()
+  self.enabled = false
+end
+
+function Process:resume()
+  self.enabled = true
+end
+
+function Process:togglePause()
+  self.enabled = not self.enabled
+end
+
 function Process.runPreUpdate(p, dt)
   if not p:canRun() then return end
   p:preUpdate(dt)
