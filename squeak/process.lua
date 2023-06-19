@@ -86,6 +86,17 @@ function Process.runPostUpdate(p, dt)
   end
 end
 
+function Process.runDraw(p)
+  if not p:canRun() then return end
+  p:draw()
+  if not p:canRun() then return end
+  local childProcesses = p.childProcesses
+  for i = 1, #childProcesses do
+    local childProcess = childProcesses[i]
+    Process.runDraw(childProcess)
+  end
+end
+
 function Process:die()
   self.dead = true
 end
@@ -138,6 +149,7 @@ end
 function Process:preUpdate(dt) end
 function Process:update(dt) end
 function Process:postUpdate(dt) end
+function Process:draw() end
 function Process:onDispose() end
 
 Process.roots = {}
