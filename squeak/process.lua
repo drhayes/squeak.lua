@@ -1,3 +1,5 @@
+-- Shamelessly stolen from Deepnight
+-- https://github.com/deepnight/deepnightLibs/blob/9d2b3d8bb54ad81be12e00b6c774df59aff70b61/src/dn/Process.hx
 local Object = require('lib.classic')
 local lume = require('lib.lume')
 
