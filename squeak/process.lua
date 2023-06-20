@@ -53,6 +53,17 @@ function Process:togglePause()
   self.enabled = not self.enabled
 end
 
+function Process:sendMessage(message, ...)
+  if not self:canRun() then return end
+  self:onMessage(message, ...)
+  if not self:canRun() then return end
+  local childProcesses = self.childProcesses
+  for i = 1, #childProcesses do
+    local childProcess = childProcesses[i]
+    childProcess:sendMessage(message, ...)
+  end
+end
+
 function Process.runPreUpdate(p, dt)
   if not p:canRun() then return end
   p:preUpdate(dt)
@@ -150,6 +161,7 @@ function Process:preUpdate(dt) end
 function Process:update(dt) end
 function Process:postUpdate(dt) end
 function Process:draw() end
+function Process:onMessage(message, ...) end
 function Process:onDispose() end
 
 Process.roots = {}
